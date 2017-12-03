@@ -31,4 +31,31 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	tpl1, err1 := template.ParseGlob("01_Templates/02_ParsingAndExecutingTemplate/Text/*") //Glob is used to parse all the content within a folder
+	if err1 != nil {
+		log.Fatalln(err1)
+	}
+
+	err1 = tpl1.Execute(os.Stdout, nil)
+	if err1 != nil {
+		log.Fatalln(err1)
+	}
+
+	err1 = tpl1.ExecuteTemplate(os.Stdout, "sample2.txt", nil)
+	if err1 != nil {
+		log.Fatalln(err1)
+	}
 }
+
+// we can use template.Must to perform error checking
+
+/* func init(){
+tpl:=template.Must(template.ParseGlob("Folder"))
+}
+
+This makes your code more performant
+and we can declare tpl at package level scope
+
+var tpl *template.Template
+*/
