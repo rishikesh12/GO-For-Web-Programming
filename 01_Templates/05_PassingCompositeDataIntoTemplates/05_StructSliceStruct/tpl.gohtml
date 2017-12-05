@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+  <title>Items</title>
+</head>
+<body>
+  <ul>
+    {{range .Wisdom}}
+    <li>{{.Name}} - {{.Motto}}</li>
+    {{end}}
+  </ul>
+  <ul>
+    {{range .Transport}}
+    <li>{{.Company}} - {{.Model}}</li>
+    {{end}}
+  </ul>
+</body>
+</html>
