@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+  <title>Global Functions Example</title>
+</head>
+<body>
+  Example 1
+  {{range .}}
+  {{.}}
+  {{end}}
+
+  Example 2
+  {{if .}}
+  {{.}}
+  {{end}}
+
+  Example 3
+  {{range .}}
+    {{if .Name}}
+      {{.Name}}
+    {{end}}
+  {{end}}
+
+  Example 4
+  {{range .}}
+    {{if and .Name .Admin}}
+      {{.}}
+    {{end}}
+  {{end}}
+
+</body>
+</html>
+<!-- Example to illustrate usage of if PredefinedGlobalFunction -->
