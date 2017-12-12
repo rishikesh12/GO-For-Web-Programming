@@ -18,7 +18,7 @@ func dog(w http.ResponseWriter, req *http.Request) {
 	io.WriteString(w, `
 	<img src="/tadm.jpg">
 	`) //this path redirects to dogPic func where iocopy is used
-}
+}ud
 
 func dogPic(w http.ResponseWriter, req *http.Request) {
 
