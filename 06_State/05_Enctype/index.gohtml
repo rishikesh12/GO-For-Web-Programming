@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="eng">
+<head>
+  <title>
+    enctype
+  </title>
+</head>
+<body>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="text" name="firstname" placeholder="Enter your firstname">
+    <input type="text" name="Lastname" placeholder="Enter your Lastname">
+    <input type="submit">
+    </form>
+
+    {{if .}}
+     <h1> BODY: {{.}}</h1>
+     {{end}}
+    </html>
+<!-- if data passed by the form will be displayed and the format of the data passed
+will vary based on the enctype, there are 3 types of enctype text/plain, multipart/form-data
+and default format -->
