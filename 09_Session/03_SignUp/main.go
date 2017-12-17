@@ -8,54 +8,75 @@ import (
 	"github.com/satori/go.uuid"
 )
 
-var tpl *template.Template
-
 type user struct {
-	Uname    string
-	First    string
-	Last     string
-	LoggedIn bool
+	Uname string
+	Fname string
+	Pass  string
 }
 
-var dbsession = map[string]string{} // key uuid and value uname
-var db = map[string]user{}          // Map with uname as key and the user as value
+var dbsession = map[string]string{} //key uuid and value username
+var dbuser = map[string]user{}      //key username and value user
+var tpl *template.Template
 
 func init() {
-	//fmt.Println(os.Getwd())
 	tpl = template.Must(template.ParseGlob("templates/*"))
 }
 
 func main() {
-	http.HandleFunc("/", foo)
+	http.HandleFunc("/", index)
+	http.HandleFunc("/signup", signup)
 	http.HandleFunc("/bar", bar)
-	//http.Handle("/favicon.ico", http.NotFoundHandler())
+	http.Handle("/favicon.ico", http.NotFoundHandler())
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func foo(w http.ResponseWriter, r *http.Request) {
-	//Creating a cookie if it doesn't exist
-	c, err := r.Cookie("session")
+func index(w http.ResponseWriter, r *http.Request) {
+	u := getuser(w, r)
+	err := tpl.ExecuteTemplate(w, "index.gohtml", u)
 	if err != nil {
+		log.Println(err)
+	}
+
+}
+
+func signup(w http.ResponseWriter, r *http.Request) {
+
+	check := alreadyregistered(r)
+	if check {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	//get form database
+
+	if r.Method == http.MethodPost {
+		uname := r.FormValue("uname")
+		fname := r.FormValue("fname")
+		pass := r.FormValue("pass")
+
+		//check if username is taken
+		if _, ok := dbuser[uname]; ok {
+			http.Error(w, "Username already taken", http.StatusForbidden)
+		}
+
+		//create Session
 		id := uuid.NewV4()
-		c = &http.Cookie{
+		c := &http.Cookie{
 			Name:  "session",
 			Value: id.String(),
 		}
 		http.SetCookie(w, c)
-	}
-	//Process the form submission
-	var u user
-	if r.Method == http.MethodPost {
-		uname := r.FormValue("uname")
-		f := r.FormValue("fname")
-		l := r.FormValue("lname")
-		li := r.FormValue("loggedin") == "on" //on is a keyword for checkbox
-		u = user{uname, f, l, li}
-		dbsession[c.Value] = uname
-		db[uname] = u
-	}
 
-	err = tpl.ExecuteTemplate(w, "index.gohtml", u)
+		u := user{uname, fname, pass}
+		//register the new user in the database
+		dbsession[c.Value] = uname
+		dbuser[uname] = u
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+
+	}
+	err := tpl.ExecuteTemplate(w, "signup.gohtml", nil)
 	if err != nil {
 		log.Println(err)
 	}
@@ -63,23 +84,16 @@ func foo(w http.ResponseWriter, r *http.Request) {
 }
 
 func bar(w http.ResponseWriter, r *http.Request) {
-	//get the cookie
-	c, err := r.Cookie("session")
-	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+	//check if user exists
+	check := alreadyregistered(r)
+	if !check {
+		http.Redirect(w, r, "/signup", http.StatusSeeOther)
 		return
 	}
-	uname, ok := dbsession[c.Value]
-	if !ok {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-	err = tpl.ExecuteTemplate(w, "bar.gohtml", db[uname])
+	u := getuser(w, r)
+	err := tpl.ExecuteTemplate(w, "bar.gohtml", u)
 	if err != nil {
 		log.Println(err)
 	}
 
 }
-
-//comma ok idiom : A map always returns a zero values for any value that you might have not put in the Map
-// so we use ok to check whether we have put a particluar value in the map

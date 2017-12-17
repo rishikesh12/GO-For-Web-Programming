@@ -4,13 +4,14 @@
   <title>Session</title>
 </head>
 <body>
-  <form method="POST" action="/">
-    <input type="text" name="uname" placeholder="User Name"><br>
-    <input type="text" name="fname" placeholder="First Name"><br>
-    <input type="text" name="lname" placeholder="Last Name"><br>
-    <label for="li">Logged In</label>
-    <input type="checkbox" id="li" name="loggedin"><br>
-    <input type="submit">
-  </form>
+  {{if .Uname}}
+    {{.Fname}}<br>
+  {{else}}
+  <h2><a href="/signup">Signup</a></h2>
+  {{end}}
+
+  <br>
+  <h2><a href="/bar">GotoBar</a></h2>
+
 </body>
 </html>
